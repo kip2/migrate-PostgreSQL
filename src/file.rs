@@ -30,7 +30,7 @@ pub fn create_migration_file() -> Result<(), Box<dyn Error>> {
     // Create Migrations directory if it does not exist
     let dir_path = Path::new("./Migrations");
     if !dir_path.exists() {
-        fs::create_dir_all(dir_path).expect("test");
+        fs::create_dir_all(dir_path).expect("Failed create directory");
     }
 
     // Retrieve common timestamp
