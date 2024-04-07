@@ -32,7 +32,7 @@ pub async fn migrate() -> Result<(), Box<dyn Error>> {
             .get(index)
             .expect("Matching down migration not found");
         let queries =
-            read_sql_file(&up_path).expect(&format!("Failed to read {} file", &up_filename));
+            parse_sql_file(&up_path).expect(&format!("Failed to read {} file", &up_filename));
         execute_queries(&pool, queries)
             .await
             .expect("Query execute failed");
@@ -140,7 +140,7 @@ pub async fn roolback(n: u64) -> Result<(), Box<dyn Error>> {
             .get(index)
             .expect("Matching down migration not found");
         let queries =
-            read_sql_file(&down_path).expect(&format!("Failed to read {} file", &down_filename));
+            parse_sql_file(&down_path).expect(&format!("Failed to read {} file", &down_filename));
         execute_queries(&pool, queries)
             .await
             .expect("Query execute failed");
@@ -187,7 +187,7 @@ pub async fn read_and_run(path: String) -> Result<(), Box<dyn Error>> {
     let pool = db_pool().await;
 
     // Read SQL queries
-    let queries = read_sql_file(&path).unwrap();
+    let queries = parse_sql_file(&path).unwrap();
 
     execute_queries(&pool, queries)
         .await
@@ -195,7 +195,7 @@ pub async fn read_and_run(path: String) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn read_sql_file(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
+fn parse_sql_file(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let contents = fs::read_to_string(path)?;
 
     let queries = contents
