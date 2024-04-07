@@ -1,7 +1,7 @@
 use crate::file::get_all_migration_files;
 use crate::Migrations;
-use sqlx::mysql::{MySqlPoolOptions, MySqlQueryResult};
-use sqlx::{MySql, Pool, Row};
+use sqlx::postgres::{PgPoolOptions, PgQueryResult, PgRow};
+use sqlx::{Pool, Postgres, Row};
 use std::io;
 use std::{env, error::Error, fs};
 
@@ -47,7 +47,7 @@ pub async fn migrate() -> Result<(), Box<dyn Error>> {
 pub async fn create_migration_table() {
     // Table definitions for managing migrations
     let query = "CREATE TABLE _migrations (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         up_file VARCHAR(400) NOT NULL,
         down_file VARCHAR(400) NOT NULL
     );"
@@ -56,7 +56,7 @@ pub async fn create_migration_table() {
     run(query).await.expect("Failed migration table");
 }
 
-async fn get_last_migration(db: &Pool<MySql>, column_type: Migrations) -> Option<String> {
+async fn get_last_migration(db: &Pool<Postgres>, column_type: Migrations) -> Option<String> {
     let query = format!("SELECT up_file, down_file FROM _migrations ORDER BY id DESC LIMIT 1");
     let result = execute_select_query(db, query).await;
 
@@ -85,11 +85,11 @@ async fn get_last_migration(db: &Pool<MySql>, column_type: Migrations) -> Option
 }
 
 pub async fn insert_migration(
-    db: &Pool<MySql>,
+    db: &Pool<Postgres>,
     up_file_name: String,
     down_file_name: String,
-) -> Result<MySqlQueryResult, Box<dyn Error>> {
-    let query = "INSERT INTO _migrations (up_file, down_file) VALUES (?, ?)";
+) -> Result<PgQueryResult, Box<dyn Error>> {
+    let query = "INSERT INTO _migrations (up_file, down_file) VALUES ($1, $2)";
 
     let result = sqlx::query(query)
         .bind(up_file_name)
@@ -155,10 +155,10 @@ pub async fn roolback(n: u64) -> Result<(), Box<dyn Error>> {
 }
 
 pub async fn remove_migration(
-    db: &Pool<MySql>,
+    db: &Pool<Postgres>,
     down_filename: String,
-) -> Result<MySqlQueryResult, Box<dyn Error>> {
-    let query = "DELETE FROM _migrations WHERE down_file = ?";
+) -> Result<PgQueryResult, Box<dyn Error>> {
+    let query = "DELETE FROM _migrations WHERE down_file = $1";
 
     let result = sqlx::query(query).bind(down_filename).execute(db).await;
 
@@ -171,11 +171,11 @@ pub async fn run(query: String) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn db_pool() -> Pool<MySql> {
+async fn db_pool() -> Pool<Postgres> {
     dotenv::dotenv().expect("Fialed to read .env file");
     let database_url = env::var("DATABASE_URL").expect("DABASE_URL must be set");
 
-    let pool = MySqlPoolOptions::new()
+    let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&database_url)
         .await
@@ -207,9 +207,9 @@ fn read_sql_file(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
 }
 
 async fn execute_select_query(
-    db: &Pool<MySql>,
+    db: &Pool<Postgres>,
     query: String,
-) -> Result<Vec<sqlx::mysql::MySqlRow>, Box<dyn Error>> {
+) -> Result<Vec<PgRow>, Box<dyn Error>> {
     // Check if the query string starts with SELECT
     if !query.trim_start().to_uppercase().starts_with("SELECT") {
         return Err("Query must start with SELECT".into());
@@ -226,7 +226,7 @@ async fn execute_select_query(
     }
 }
 
-async fn execute_query(db: &Pool<MySql>, query: String) {
+async fn execute_query(db: &Pool<Postgres>, query: String) {
     // Gererate transaction
     let mut tx = db.begin().await.expect("transaction error.");
 
@@ -248,7 +248,7 @@ async fn execute_query(db: &Pool<MySql>, query: String) {
     });
 }
 
-async fn execute_queries(db: &Pool<MySql>, queries: Vec<String>) -> Result<(), Box<dyn Error>> {
+async fn execute_queries(db: &Pool<Postgres>, queries: Vec<String>) -> Result<(), Box<dyn Error>> {
     // Gererate transaction
     let mut tx = db.begin().await.expect("transaction error.");
 
@@ -287,7 +287,7 @@ pub async fn get_executable_query_count(n: u64) -> u64 {
     }
 }
 
-async fn get_count(db: &Pool<MySql>, query: String) -> Result<i64, Box<dyn Error>> {
+async fn get_count(db: &Pool<Postgres>, query: String) -> Result<i64, Box<dyn Error>> {
     let rows = execute_select_query(&db, query).await?;
     if let Some(row) = rows.first() {
         let count: i64 = row.get(0);
@@ -319,7 +319,7 @@ mod tests {
     #[tokio::test]
     async fn test_remove_migration() {
         let pool = db_pool().await;
-        let down_file = "2024-04-03_1712147726_down.sql".to_string();
+        let down_file = "2024-04-06_1712403500_down.sql".to_string();
         let _ = remove_migration(&pool, down_file).await;
     }
 
@@ -347,8 +347,8 @@ mod tests {
     #[tokio::test]
     async fn test_insert_migration() {
         let pool = db_pool().await;
-        let up_file = "2024-03-31_1711885799_up.sql".to_string();
-        let down_file = "2024-03-31_1711885799_down.sql".to_string();
+        let up_file = "2024-04-06_1712403500_up.sql".to_string();
+        let down_file = "2024-04-06_1712403500_down.sql".to_string();
         let _ = insert_migration(&pool, up_file, down_file).await;
     }
 
