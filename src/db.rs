@@ -1,4 +1,5 @@
 use crate::file::get_all_migration_files;
+use crate::parser::parse_text;
 use crate::Migrations;
 use sqlx::postgres::{PgPoolOptions, PgQueryResult, PgRow};
 use sqlx::{Pool, Postgres, Row};
@@ -198,11 +199,8 @@ pub async fn read_and_run(path: String) -> Result<(), Box<dyn Error>> {
 fn parse_sql_file(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let contents = fs::read_to_string(path)?;
 
-    let queries = contents
-        .split(';')
-        .filter(|s| !s.trim().is_empty())
-        .map(|s| s.trim().to_string())
-        .collect();
+    let queries = parse_text(&contents);
+
     Ok(queries)
 }
 
