@@ -114,10 +114,10 @@ Write the SQL statement to rollback the results executed in the up file.
 
 For example,
 
-- If you define table creation in `up`, define a SQL statement to delete that table in `down`.
-- If you define an insert statement in `up`, define a SQL statement to delete the inserted data in `down`.
+- If you define table creation in `up file`, define a SQL statement to delete that table in `down file`.
+- If you define an insert statement in `up file`, define a SQL statement to delete the inserted data in `down file`.
 
-In the example below, the SQL statement to delete the table defined in `up` is written:
+In the example below, the SQL statement to delete the table defined in `up file` is written:
 
 ```sql
 DROP TABLE users;
