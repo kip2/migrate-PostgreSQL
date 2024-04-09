@@ -117,7 +117,7 @@ up fileに記載したSQL実行結果を、ロールバックするためのSQL�
 一例として、
 
 - `up file`にテーブル作成のSQL文を定義。 -> `down file`に`up file`で作成したテーブルを削除するSQL文を定義。
-- `up file`にデータをインサートするSQL文を定義。 -> `down file`に`up filej`でインサートしたデータを削除するSQL文を定義。
+- `up file`にデータをインサートするSQL文を定義。 -> `down file`に`up file`でインサートしたデータを削除するSQL文を定義。
 
 以下の例では、`up file`で定義したテーブルを削除するSQL文を定義しています。
 
