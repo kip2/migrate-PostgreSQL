@@ -234,13 +234,13 @@ async fn execute_query(db: &Pool<Postgres>, query: String) {
         Ok(_) => {}
         Err(e) => {
             println!("Database query failed: {}", e);
-            // rollback
+            // Rollback
             tx.rollback().await.expect("Transaction rollback error.");
             return;
         }
     }
 
-    // transaction commit
+    // Transaction commit
     let _ = tx.commit().await.unwrap_or_else(|e| {
         println!("{:?}", e);
     });
@@ -258,14 +258,14 @@ async fn execute_queries(db: &Pool<Postgres>, queries: Vec<String>) -> Result<()
             Ok(_) => {}
             Err(e) => {
                 println!("Database query failed: {}", e);
-                // rollback
+                // Rollback
                 tx.rollback().await.expect("Transaction rollback error.");
                 return Err(e.into());
             }
         }
     }
 
-    // transaction commit
+    // Transaction commit
     let _ = tx.commit().await.unwrap_or_else(|e| {
         println!("{:?}", e);
     });
