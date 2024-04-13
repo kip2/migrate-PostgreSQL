@@ -52,10 +52,10 @@ DATABASE_URL=postgres://username:password@hostname:port/db_name
 実行前に、PostgreSQLを使える環境、かつ、`.env`で接続の設定をしていることを確認してください。
 
 ```shell
-migrate -i
+./migrate -i
 
 # もしくは
-migrate --init
+./migrate --init
 ```
 
 コマンド実行後、DBに`migrations`という名前の、マイグレーション管理用のテーブルが作成されます。
@@ -65,10 +65,10 @@ migrate --init
 実行するマイグレーションを定義するためのファイルを作成します。
 
 ```shell
-migrate -c
+./migrate -c
 
 # もしくは
-migrate --create
+./migrate --create
 ```
 
 コマンド実行後、以下のようなファイルが作成されます。
@@ -130,7 +130,7 @@ DROP TABLE users;
 環境設定、事前準備が完了した後、以下のコマンドでマイグレーションが実行されます。
 
 ```shell
-migrate
+./migrate
 ```
 
 ## マイグレーション対象ファイル
@@ -143,17 +143,17 @@ migrate
 
 ```shell
 # マイグレーションを実行
-migrate
+./migrate
 
 # 新しいマイグレーションファイルを作成
-migrate --create
+./migrate --create
 
 # マイグレーションファイルにSQL文を追加定義
 # 記載は割愛
 
 # 新規マイグレーションを実行
 # 新規追加したマイグレーションのみが実行される
-migrate
+./migrate
 ```
 
 # ロールバック
@@ -164,15 +164,15 @@ migrate
 
 ```shell
 # <n>は、いくつ前の段階に戻すかの回数を指定する
-migrate -r <n>
+./migrate -r <n>
 # もしくは
-migrate --rollback <n>
+./migrate --rollback <n>
 
 # 一例
 # 2段階前の状態に戻す場合
-migrate -r 2
+./migrate -r 2
 # もしくは
-migrate --rollback 2
+./migrate --rollback 2
 ```
 
 また、可能な回数のロールバックのみを実行します。
@@ -186,9 +186,9 @@ migrate --rollback 2
 以下のコマンドでヘルプが参照可能です。
 
 ```shell
-migrate -h
+./migrate -h
 # もしくは
-migrate --help
+./migrate --help
 ```
 
 # LICENSE

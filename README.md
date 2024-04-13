@@ -52,9 +52,9 @@ First, create a table to manage the migrations.
 Ensure you have a PostgreSQL environment and have set up the connection in the `.env` file before executing.
 
 ```shell
-migrate -i
+./migrate -i
 # or
-migrate --init
+./migrate --init
 ```
 
 After executing the command, a table named `migrations` will be created in the database for managing the migrations.
@@ -64,9 +64,9 @@ After executing the command, a table named `migrations` will be created in the d
 Create files to define the migrations you want to execute.
 
 ```shell
-migrate -c
+./migrate -c
 # or
-migrate --create
+./migrate --create
 ```
 
 After executing the command, files like the following will be created:
@@ -128,7 +128,7 @@ DROP TABLE users;
 After completing the environment setup and preliminary steps, the migrations are executed with the following command:
 
 ```shell
-migrate
+./migrate
 ```
 
 ## Migration Target Files
@@ -141,17 +141,17 @@ For example:
 
 ```shell
 # Execute the migration
-migrate
+./migrate
 
 # Create a new migration file
-migrate --create
+./migrate --create
 
 # Add SQL statements to the migration file
 # Omitted here
 
 # Execute the new migration
 # Only the newly added migration will be executed
-migrate
+./migrate
 ```
 
 # Rollback
@@ -162,15 +162,15 @@ The command is as follows:
 
 ```shell
 # <n> specifies the number of stages to rollback
-migrate -r <n>
+./migrate -r <n>
 # or
-migrate --rollback <n>
+./migrate --rollback <n>
 
 # Example
 # To rollback to two stages before
-migrate -r 2
+./migrate -r 2
 # or
-migrate --rollback 2
+./migrate --rollback 2
 ```
 
 Also, it will only execute the possible number of rollbacks.
@@ -184,9 +184,9 @@ If you are having trouble with the commands, refer to the help.
 You can refer to the help with the following command:
 
 ```shell
-migrate -h
+./migrate -h
 # or
-migrate --help
+./migrate --help
 ```
 
 # LICENSE
